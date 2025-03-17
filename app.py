@@ -1,8 +1,10 @@
+import uuid
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from models import Receipt
+from services import process_receipt_service, get_receipt_points_service
 
 app = FastAPI()
 
@@ -26,9 +28,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.post("/receipts/process")
 async def process_receipt(receipt: Receipt):
-    return {"receipt": receipt}
+    receipt_id = str(uuid.uuid4())
+    process_receipt_service(receipt_id, receipt)
+    return {"id": receipt_id}
+
 
 
 @app.get("/receipts/{id}/points")
 async def get_receipt_points(id: str):
-    return {"message": f"Get points for receipt {id}"}
+    points = get_receipt_points_service(id)
+    if points >= 0:
+        return {"points": points}
+    return JSONResponse(
+        status_code=404, content={"message": "No receipt found for that ID."}
+    )
