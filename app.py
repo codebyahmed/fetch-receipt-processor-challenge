@@ -62,7 +62,7 @@ async def get_receipt_points(
     id: str = Path(
         ..., description="ID of the receipt to retrieve points for", pattern="^\\S+$"
     ),
-) -> ReceiptPoints | JSONResponse:
+) -> Response:
     points = get_receipt_points_service(id)
     if points >= 0:
         return {"points": points}
