@@ -16,12 +16,17 @@ A FastAPI web service for the Fetch Backend Challenge.
 git clone https://github.com/codebyahmed/fetch-receipt-processor-challenge.git
 ```
 
-1. Build the Docker image:
+2. Change direcotry:
+```bash
+cd fetch-receipt-processor-challenge
+```
+
+3. Build the Docker image:
 ```bash
 docker build -t ahmeds-receipt-processor .
 ```
 
-2. Run the container:
+4. Run the container:
 ```bash
 docker run -p 8000:8000 ahmeds-receipt-processor
 ```
