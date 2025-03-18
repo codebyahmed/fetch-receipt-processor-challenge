@@ -36,3 +36,18 @@ class Receipt(BaseModel):
         pattern="^\\d+\\.\\d{2}$",
         example="6.49",
     )
+
+class ReceiptPoints(BaseModel):
+    points: int = Field(
+        description="The total number of points earned for this receipt.",
+        ge=0,
+        example=100,
+    )
+
+class ReceiptId(BaseModel):
+    id: str = Field(
+        description="The unique identifier for the receipt.",
+        pattern="^\\S+$",
+        example="c1e7d9f1-3d4d-4e4b-8d0b-8e7e1e4b6d9f",
+    )
+

@@ -1,9 +1,9 @@
 import uuid
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, Path, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from models import Receipt
+from models import Receipt, ReceiptPoints, ReceiptId
 from services import process_receipt_service, get_receipt_points_service
 
 app = FastAPI()
@@ -26,16 +26,43 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-@app.post("/receipts/process")
-async def process_receipt(receipt: Receipt):
+@app.post(
+    "/receipts/process",
+    response_model=ReceiptId,
+    responses={
+        400: {
+            "description": "The receipt is invalid",
+            "content": {
+                "application/json": {"example": {"message": "The receipt is invalid."}}
+            },
+        }
+    },
+)
+async def process_receipt(receipt: Receipt) -> Response:
     receipt_id = str(uuid.uuid4())
     process_receipt_service(receipt_id, receipt)
     return {"id": receipt_id}
 
 
-
-@app.get("/receipts/{id}/points")
-async def get_receipt_points(id: str):
+@app.get(
+    "/receipts/{id}/points",
+    response_model=ReceiptPoints,
+    responses={
+        404: {
+            "description": "Receipt not found",
+            "content": {
+                "application/json": {
+                    "example": {"message": "No receipt found for that ID."}
+                }
+            },
+        }
+    },
+)
+async def get_receipt_points(
+    id: str = Path(
+        ..., description="ID of the receipt to retrieve points for", pattern="^\\S+$"
+    ),
+) -> ReceiptPoints | JSONResponse:
     points = get_receipt_points_service(id)
     if points >= 0:
         return {"points": points}
